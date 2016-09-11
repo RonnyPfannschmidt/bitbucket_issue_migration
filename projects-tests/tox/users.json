@@ -242,7 +242,7 @@
   "simlun": null,
   "simonb": null,
   "sleepycal": null,
-  "sontek": null,
+  "sontek": true,
   "sorin": null,
   "spookylukey": null,
   "ssokolow": null,
@@ -288,8 +288,8 @@
   "wizdumb": null,
   "wmyll6": null,
   "wolever": null,
-  "wosc": null,
-  "wreszelewski": null,
-  "yarikoptic": null,
+  "wosc": true,
+  "wreszelewski": true,
+  "yarikoptic": true,
   "zzzeek": true
 }
