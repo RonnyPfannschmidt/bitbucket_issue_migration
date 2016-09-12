@@ -1,46 +1,64 @@
 
-
-def format_user(author_info):
-    if not author_info:
-        return "Anonymous"
-
-    if author_info['first_name'] and author_info['last_name']:
-        return " ".join([author_info['first_name'], author_info['last_name']])
-
-    if 'username' in author_info:
-        return '[{0}](http://bitbucket.org/{0})'.format(
-            author_info['username']
-        )
-
-
-def format_name(issue):
-    return format_user(issue.get('reported_by'))
-
-
-def format_body(issue, repo, usermap=None):
-    content = clean_body(issue['content'])
-    return """{body}
+ISSUE = """{body}
 
 
 - Bitbucket: https://bitbucket.org/{repo}/issue/{id}
 - Originally reported by: {user}
 - Originally created at: {created_on}
-""".format(
+"""
+
+
+COMMENT = """Original comment by {user}
+
+{body}"""
+
+
+def format_user(author_info, usermap):
+    if not author_info:
+        return "Anonymous"
+    username = (
+        author_info.get('username')
+        if isinstance(author_info, dict)
+        else author_info)
+    mapped = usermap.get(username)
+    if mapped not in (None, False):
+        return '@' + (mapped if isinstance(mapped, str) else username)
+
+    if isinstance(author_info, dict):
+        if author_info['first_name'] and author_info['last_name']:
+            return " ".join(
+                [author_info['first_name'], author_info['last_name']])
+
+    if username is not None:
+
+        return '[{0}](http://bitbucket.org/{0})'.format(
+            username
+        )
+
+
+def format_name(issue, usermap):
+    return format_user(issue.get('reported_by'), usermap)
+
+
+def format_body(issue, repo, usermap):
+    content = clean_body(issue['content'], usermap)
+    return ISSUE.format(
         body=content,
         repo=repo,
         id=issue['local_id'],
-        user=format_name(issue),
+        user=format_name(issue, usermap),
         created_on=issue['created_on'],
     )
 
 
 def format_comment(comment, usermap):
-    return """Original comment by {user}
+    return COMMENT.format(
+        body=comment['body'],
+        user=format_user(comment['user'], usermap),
+    )
 
-{body}""".format(**comment)
 
-
-def clean_body(body):
+def clean_body(body, usermap):
     lines = []
     in_block = False
     for line in body.splitlines():

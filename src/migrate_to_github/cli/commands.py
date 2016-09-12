@@ -24,12 +24,12 @@ def fetch(store):
         comments[eid] = bitbucket.get_comments(get, elem, existing)
 
 
-def extract_users(store):
+def extract_users(store, usermap=None):
     """extract username list from authormap"""
 
     issues, comments = bitbucket.stores(store)
 
-    usermap = store.get('users', {})
+    usermap = usermap or store.get('users', {})
     for item in gprocess(issues,
                          label='Extracting usermap'):
         issue = issues[item]
@@ -43,19 +43,20 @@ def extract_users(store):
     store['users'] = usermap
 
 
-def convert(store):
+def convert(store, usermap=None):
     issues, comments = bitbucket.stores(store)
 
     simple_store = FileStore.ensure(store.path / 'github_uploads')
 
     repo = store['repos']['bitbucket']
     items = issues.items()
+    usermap = usermap or store.get('users', {})
     for key, issue in gprocess(items, label='Preparing Import Requests'):
         issue['comments'] = comments[key]
         simplified = bitbucket.simplify_issue(
                 bb_issue=issue,
                 repo=repo,
-                usermap=store.get('users', {}))
+                usermap=usermap)
         simple_store[key] = simplified
 
 

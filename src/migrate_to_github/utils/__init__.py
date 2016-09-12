@@ -1,6 +1,7 @@
 import json as serializer
 import requests
 import click
+import attr
 
 
 def gprocess(iterator, *k, **kw):
@@ -67,3 +68,35 @@ def maybe_contributors(issue, comments):
 
 def contributors(issue, comments):
     return filter(None, maybe_contributors(issue, comments))
+
+
+@attr.s
+class FetchTrackingUserMap(object):
+    elements = attr.ib()
+    fetch_track = attr.ib(default=attr.Factory(dict))
+
+    def get(self, name):
+        if name not in self.elements:
+            return
+        if name not in self.fetch_track:
+            self.fetch_track[name] = 0
+        self.fetch_track[name] += 1
+        return self.elements[name]
+
+    def _table_elements(self):
+        fmt = "{name:<20}   {converted:<20}   {uses}"
+        yield fmt
+        want = sorted(self.fetch_track.items(), key=lambda x: (x[1], x[0]))
+        for name, uses in want:
+            if name not in self.elements:
+                continue
+            converted = self.elements[name]
+            if converted is True:
+                converted = name
+            if converted in (False, None):
+                converted = "---"
+
+            yield fmt.format(name=name, converted=converted, uses=uses)
+
+    def as_table(self):
+        return '\n'.join(self._table_elements())

@@ -4,6 +4,7 @@ from pathlib2 import Path
 from migrate_to_github.cli import commands
 from migrate_to_github.cli.commands import upload_github_issues
 from migrate_to_github.store import FileStore
+from migrate_to_github.utils import FetchTrackingUserMap
 
 
 @click.group(chain=True)
@@ -35,8 +36,15 @@ def extract_users(store):
 
 
 @command
-def convert(store):
-    commands.convert(store)
+@click.option('--verbose', is_flag=True)
+def convert(store, verbose):
+    if verbose:
+        usermap = FetchTrackingUserMap(store['users'])
+    else:
+        usermap = None
+    commands.convert(store, usermap)
+    if usermap:
+        print(usermap.as_table())
 
 
 @command

@@ -88,16 +88,16 @@ def simplify_issue(bb_issue, repo, usermap):
 
 
 def simplify_comment(comment, usermap):
-    comment = _parse_comment(comment)
+    comment = _parse_comment(comment, usermap)
     return {'body': format_comment(comment, usermap)}
 
 
-def _parse_comment(comment):
+def _parse_comment(comment, usermap):
     """
     Parse a comment as returned from Bitbucket API.
     """
     return dict(
-            user=format_user(comment['author_info']),
+            user=format_user(comment['author_info'], usermap),
             created_at=comment['utc_created_on'],
             body=comment['content'],
             number=comment['comment_id'], )
