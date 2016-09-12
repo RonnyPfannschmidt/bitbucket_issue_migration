@@ -93,8 +93,10 @@ class FetchTrackingUserMap(object):
             converted = self.elements[name]
             if converted is True:
                 converted = name
-            if converted in (False, None):
+            if converted is None:
                 converted = "---"
+            if converted is False:
+                converted = "  # "
 
             yield fmt.format(name=name, converted=converted, uses=uses)
 
