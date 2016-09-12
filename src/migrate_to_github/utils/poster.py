@@ -75,5 +75,5 @@ class Poster(object):
 
 def get_github_issue_poster(store, token):
     github_repo = store['repos']['github']
-    post = utils.Poster(token, utils.GITHUB_REPO_IMPORT_API, repo=github_repo)
+    post = Poster(token, utils.GITHUB_REPO_IMPORT_API, repo=github_repo)
     return post
