@@ -13,21 +13,14 @@ COMMENT = """Original comment by {user}
 {body}"""
 
 
-def format_user(author_info, usermap):
-    if not author_info:
+def format_user(user_data, usermap):
+    if user_data is None:
         return "Anonymous"
-    username = (
-        author_info.get('username')
-        if isinstance(author_info, dict)
-        else author_info)
+    assert isinstance(user_data, dict), user_data
+    username = user_data.get('username')
     mapped = usermap.get(username)
     if mapped not in (None, False):
         return '@' + (mapped if isinstance(mapped, str) else username)
-
-    if isinstance(author_info, dict):
-        if author_info['first_name'] and author_info['last_name']:
-            return " ".join(
-                [author_info['first_name'], author_info['last_name']])
 
     if username is not None:
 
@@ -36,26 +29,19 @@ def format_user(author_info, usermap):
         )
 
 
-def format_name(issue, usermap):
-    return format_user(issue.get('reported_by'), usermap)
-
-
 def format_body(issue, repo, usermap):
     content = clean_body(issue['content'], usermap)
     return ISSUE.format(
         body=content,
         repo=repo,
         id=issue['local_id'],
-        user=format_name(issue, usermap),
+        user=format_user(issue.get('reported_by'), usermap),
         created_on=issue['created_on'],
     )
 
 
 def format_comment(comment, usermap):
-    return COMMENT.format(
-        body=comment['body'],
-        user=format_user(comment['user'], usermap),
-    )
+    return COMMENT.format(**comment)
 
 
 def clean_body(body, usermap):
