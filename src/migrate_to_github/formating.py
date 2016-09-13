@@ -1,10 +1,11 @@
 
-ISSUE = """{body}
-
-
+ISSUE = """\
 - Bitbucket: https://bitbucket.org/{repo}/issue/{id}
 - Originally reported by: {user}
 - Originally created at: {created_on}
+
+
+{body}
 """
 
 
