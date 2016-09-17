@@ -6,6 +6,7 @@ from .utils import Getter
 from .store import FileStore
 
 REPO_API = "https://api.bitbucket.org/1.0/repositories/{repo}"
+BB_CLOSED = 'closed wontfix resolved invalid duplicate'
 
 
 class iter_issues(object):
@@ -78,7 +79,7 @@ def simplify_issue(bb_issue, repo, usermap):
         'issue': {
             'title': bb_issue['title'],
             'body': format_body(bb_issue, repo, usermap),
-            'closed': bb_issue['status'] in 'closed wontfix resolved invalid duplicate',
+            'closed': bb_issue['status'] in BB_CLOSED,
         },
         'comments': [
             simplify_comment(comment, usermap)
