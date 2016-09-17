@@ -78,7 +78,7 @@ def simplify_issue(bb_issue, repo, usermap):
         'issue': {
             'title': bb_issue['title'],
             'body': format_body(bb_issue, repo, usermap),
-            'closed': bb_issue['status'] in 'closed wontfix resolved',
+            'closed': bb_issue['status'] in 'closed wontfix resolved invalid duplicate',
         },
         'comments': [
             simplify_comment(comment, usermap)
