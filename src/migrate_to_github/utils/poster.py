@@ -7,6 +7,9 @@ from datetime import datetime, timedelta
 from migrate_to_github import utils
 from . import debug
 
+# XXX HACK
+GH_ISSUE_URL = "https://api.github.com/repos/{}/tox/issues/{}"
+
 
 @attr.s
 class Limiter(object):
@@ -59,6 +62,7 @@ class Poster(object):
         })
         self.limiter = Limiter()
         self.base_url = base_url.format(**args)
+        self.repo = args['repo']
 
     def __call__(self, data):
         self.limiter.wait_before_request()
@@ -67,10 +71,16 @@ class Poster(object):
         if response.status_code in (200, 202):
             return response.json()
         else:
+            click.echo(self.base_url)
             click.echo(response.status_code)
             debug(response.headers)
             debug(response.json())
             raise SystemExit(1)
+
+    def get_issue(self, iid):
+        self.limiter.wait_before_request()
+        return self.limiter.process(
+            self.session.get, GH_ISSUE_URL.format(self.repo, iid))
 
 
 def get_github_issue_poster(store, token):

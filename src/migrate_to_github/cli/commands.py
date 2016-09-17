@@ -61,8 +61,12 @@ def convert(store, usermap=None):
 
 
 def upload_github_issues(store, token):
+    from wait_for import wait_for
     post = get_github_issue_poster(store, token)
     simple_store = FileStore.ensure(store.path / 'github_uploads')
     for issue in gprocess(sorted(simple_store, key=int),
                           label='Uploading Import Requests'):
         post(simple_store.raw_data(issue))
+        wait_for(
+            post.get_issue, (issue,),
+            fail_condition=lambda response: response.status_code == 200)
