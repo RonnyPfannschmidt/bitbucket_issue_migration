@@ -8,7 +8,7 @@ from migrate_to_github import utils
 from . import debug
 
 # XXX HACK
-GH_ISSUE_URL = "https://api.github.com/repos/{}/tox/issues/{}"
+GH_ISSUE_URL = "https://api.github.com/repos/{}/issues/{}"
 
 
 @attr.s
@@ -31,7 +31,7 @@ class Limiter(object):
         time_to_reset = self.reset_timestamp - current_time
         if time_to_reset < timedelta(0):
             return 0
-        return (time_to_reset / self.remaining).total_seconds()
+        return (time_to_reset / self.remaining).total_seconds() * 0.9
 
     def process_response(self, response):
         self.record_rate_limit(

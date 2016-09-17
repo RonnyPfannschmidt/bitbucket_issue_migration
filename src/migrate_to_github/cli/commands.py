@@ -66,10 +66,18 @@ def upload_github_issues(store, token):
     simple_store = FileStore.ensure(store.path / 'github_uploads')
     for issue in gprocess(sorted(simple_store, key=int),
                           label='Uploading Import Requests'):
+        response = post.get_issue(issue)
+        if response.status_code == 200:
+            raise ValueError(issue)
         post(simple_store.raw_data(issue))
+
+        def failure_check(response):
+            print(repr(response.status_code), response.url)
+            return response.status_code != 200
         wait_for(
             post.get_issue, (issue,),
-            fail_condition=lambda response: response.status_code == 200)
+            fail_condition=failure_check,
+            timeout=500)
 
 ISSUE_GH = "https://api.github.com/repos/{gh_repo}/issues"
 ISSUE_BB = "https://bitbucket.org/{bb_repo}/issue/{number}"
