@@ -70,3 +70,25 @@ def upload_github_issues(store, token):
         wait_for(
             post.get_issue, (issue,),
             fail_condition=lambda response: response.status_code == 200)
+
+ISSUE_GH = "https://api.github.com/repos/{gh_repo}/issues"
+ISSUE_BB = "https://bitbucket.org/{bb_repo}/issue/{number}"
+
+
+def check_github_issues(store):
+    check_github_issues_detached(**store['repos'])
+
+
+def check_github_issues_detached(github, bitbucket):
+    from ..utils import Getter
+    get_issues = Getter(ISSUE_GH, gh_repo=github)
+    for i in range(1, 10):
+        page = get_issues('?page=' + str(i))
+        if not page:
+            break
+
+        for entry in page:
+            number, line = entry['number'], entry['body'].splitlines()[0]
+            url = ISSUE_BB.format(bb_repo=bitbucket, number=number)
+            if url not in line:
+                print(number, line)

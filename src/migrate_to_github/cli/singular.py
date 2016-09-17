@@ -2,7 +2,6 @@ import click
 from pathlib2 import Path
 
 from migrate_to_github.cli import commands
-from migrate_to_github.cli.commands import upload_github_issues
 from migrate_to_github.store import FileStore
 from migrate_to_github.utils import FetchTrackingUserMap
 
@@ -50,4 +49,9 @@ def convert(store, verbose):
 @command
 @click.option('--token', envvar='GITHUB_TOKEN')
 def upload(store, token):
-    upload_github_issues(store, token)
+    commands.upload_github_issues(store, token)
+
+
+@command
+def check(store):
+    commands.check_github_issues(store)
