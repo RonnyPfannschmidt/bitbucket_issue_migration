@@ -63,5 +63,6 @@ def convert(store, usermap=None):
 def upload_github_issues(store, token):
     post = get_github_issue_poster(store, token)
     simple_store = FileStore.ensure(store.path / 'github_uploads')
-    for issue in gprocess(simple_store, label='Uploading Import Requests'):
+    for issue in gprocess(sorted(simple_store, key=int),
+                          label='Uploading Import Requests'):
         post(simple_store.raw_data(issue))
