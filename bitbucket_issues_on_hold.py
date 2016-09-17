@@ -37,24 +37,20 @@ def main(repo, targetrepo, user, password, dry_run):
         max_issues = meta.json()['count']
 
     if dry_run:
-        post = print
+        req = print
     else:
-        def post(part, data):
-            response = session.post(url(part), data=data)
+        def req(method, part, data):
+            response = session.request(method, url(part), data=data)
             if response.status_code != 200:
                 print(response.text)
 
     for issue_id in range(1, max_issues+1):
         print(SEP, issue_id)
-        post(
-            '{issue_id}/comments'.format(issue_id=issue_id),
+        req('post', '{issue_id}/comments'.format(issue_id=issue_id),
             {"content": MSG_FMT.format(
                 issue_id=issue_id,
-                targetrepo=targetrepo)}
-        )
-        post(
-            '{issue_id}'.format(issue_id=issue_id),
-            {'status': 'on hold'}
-        )
+                targetrepo=targetrepo)})
+        req('put', '{issue_id}/'.format(issue_id=issue_id),
+            {'status': 'on hold'})
 
 main()
