@@ -1,5 +1,6 @@
 from __future__ import print_function
 from dateutil.parser import parse
+from operator import itemgetter
 
 from .formating import format_user, format_comment, format_body
 from .utils import Getter
@@ -74,11 +75,15 @@ def get_comments(get, issue, existing_comments):
         return existing_comments
 
 
+def sorted_comments(bb_issue):
+    return sorted(bb_issue['comments'] or [], key=itemgetter('comment_id'))
+
+
 def simplify_issue(bb_issue, repo, usermap):
 
     comments = [
         simplify_comment(comment, usermap)
-        for comment in (bb_issue['comments'] or [])
+        for comment in sorted_comments(bb_issue)
     ]
     return {
         'issue': {
