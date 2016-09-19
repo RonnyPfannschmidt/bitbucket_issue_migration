@@ -100,3 +100,42 @@ def check_github_issues_detached(github, bitbucket):
             url = ISSUE_BB.format(bb_repo=bitbucket, number=number)
             if url not in line:
                 print(number, line)
+
+
+TRANSFER_COMMENT = "This issue has been moved to GitHub: https://github.com/"
+
+
+def check_backup(store, usermap):
+    _, comments = bitbucket.stores(store)
+    _, comments_backup = bitbucket.stores(store, backup=True)
+    comments = dict(comments)
+    comments_backup = dict(comments_backup)
+    for d in comments, comments_backup:
+        for k, v in list(d.items()):
+            items = [
+                bitbucket.simplify_comment(i, usermap) for i in (v or [])
+            ]
+            items = [
+                c for c in items
+                if TRANSFER_COMMENT not in c['body']
+            ]
+            if items:
+                d[k] = items
+                for item in items:
+                    item.pop('body', None)
+            else:
+                d.pop(k, None)
+    all_keys = {*comments, *comments_backup}
+    print(sorted(map(int, all_keys)))
+    print(len(all_keys))
+    differences = {}
+    for key in all_keys:
+        old_len = len(comments_backup.get(key, ()))
+        new_len = len(comments.get(key, ()))
+        print(key, old_len, new_len)
+        if old_len != new_len:
+            differences[int(key)] = old_len, new_len
+
+    import pprint
+    pprint.pprint(differences)
+    print('cul', sum(abs(a-b) for a, b in differences.values()))

@@ -75,6 +75,11 @@ def get_comments(get, issue, existing_comments):
 
 
 def simplify_issue(bb_issue, repo, usermap):
+
+    comments = [
+        simplify_comment(comment, usermap)
+        for comment in (bb_issue['comments'] or [])
+    ]
     return {
         'issue': {
             'title': bb_issue['title'],
@@ -82,9 +87,8 @@ def simplify_issue(bb_issue, repo, usermap):
             'closed': bb_issue['status'] in BB_CLOSED,
         },
         'comments': [
-            simplify_comment(comment, usermap)
-            for comment in (bb_issue['comments'] or [])
-        ],
+            x for x in comments
+            if "This issue has been moved to GitHub" not in x['body']]
     }
 
 
@@ -109,7 +113,8 @@ def get_getter(store):
     return Getter(REPO_API, repo=repo)
 
 
-def stores(store):
-    issues = FileStore.ensure(store.path / 'bb' / 'issues')
-    comments = FileStore.ensure(store.path / 'bb' / 'comments')
+def stores(store, backup=False):
+    BB = 'bb_backup' if backup else 'bb'
+    issues = FileStore.ensure(store.path / BB / 'issues')
+    comments = FileStore.ensure(store.path / BB / 'comments')
     return issues, comments

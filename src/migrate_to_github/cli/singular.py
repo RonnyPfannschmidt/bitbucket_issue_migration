@@ -55,3 +55,8 @@ def upload(store, token):
 @command
 def check(store):
     commands.check_github_issues(store)
+
+
+@command
+def check_backup(store):
+    commands.check_backup(store, store['users'])
