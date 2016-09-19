@@ -12,4 +12,5 @@ dist/
 env/
 projects-tests/*/bb
 projects-tests/*/github_uploads
+projects-tests/*/*backup*
 bitbucket-migration.sublime-workspace
