@@ -25,4 +25,4 @@ def test_wait_needed(limiter, time):
     time.utcnow.return_value = datetime.utcfromtimestamp(10)
 
     limiter.record_rate_limit(remaining=4, reset_timestamp=20)
-    assert limiter.wait_seconds == 2.5
+    assert limiter.wait_seconds == 2.25
