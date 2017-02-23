@@ -3,6 +3,7 @@ from migrate_to_github import bitbucket
 from migrate_to_github import utils
 from migrate_to_github.utils import gprocess
 from migrate_to_github.store import FileStore
+import operator
 
 
 def init(*, path, bitbucket, github):
@@ -41,6 +42,43 @@ def extract_users(store, usermap=None):
             if author not in usermap:
                 usermap[author] = None
     store['users'] = usermap
+
+
+def user_stats(store, usermap=None, only_unmapped=False):
+    """extract username list from authormap"""
+
+    issues, comments = bitbucket.stores(store)
+
+    users = store.get('users', {})
+    usermap = usermap or {}
+    for item in gprocess(issues,
+                         label='Extracting usermap'):
+        issue = issues[item]
+        comment_list = comments[item] or []  # accounts for None
+
+        authors = utils.contributors(issue, comment_list, include_date=True)
+
+        for (author, last_updated) in authors:
+            if only_unmapped and users.get(author) is not None:
+                continue
+            infos = usermap.setdefault(author, {})
+            infos['count'] = infos.get('count', 0) + 1
+            infos['last_updated'] = max(
+                last_updated, infos.get('last_updated', ''))
+    max_author_len = max(len(x) for x in usermap)
+    max_count_len = len("%d" % max(x['count'] for x in usermap.values()))
+    usermap_items = list(dict(author=k, **v) for k, v in usermap.items())
+    usermap_items = sorted(
+        usermap_items, key=operator.itemgetter('count', 'last_updated'))
+    for info in usermap_items:
+        print(
+            "{author:{max_author_len}} "
+            "{count:>{max_count_len}}  "
+            "{last_updated}".format(
+                author=info['author'],
+                count=info['count'],
+                last_updated=info['last_updated'],
+                max_author_len=max_author_len, max_count_len=max_count_len))
 
 
 def convert(store, usermap=None):
