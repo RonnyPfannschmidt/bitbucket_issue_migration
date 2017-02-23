@@ -65,6 +65,7 @@ def user_stats(store, usermap=None, only_unmapped=False):
             infos['count'] = infos.get('count', 0) + 1
             infos['last_updated'] = max(
                 last_updated, infos.get('last_updated', ''))
+            infos.setdefault('status', set()).add(issue['status'])
     max_author_len = max(len(x) for x in usermap)
     max_count_len = len("%d" % max(x['count'] for x in usermap.values()))
     usermap_items = list(dict(author=k, **v) for k, v in usermap.items())
@@ -74,10 +75,11 @@ def user_stats(store, usermap=None, only_unmapped=False):
         print(
             "{author:{max_author_len}} "
             "{count:>{max_count_len}}  "
-            "{last_updated}".format(
+            "{last_updated}  {status}".format(
                 author=info['author'],
                 count=info['count'],
                 last_updated=info['last_updated'],
+                status=info['status'],
                 max_author_len=max_author_len, max_count_len=max_count_len))
 
 
