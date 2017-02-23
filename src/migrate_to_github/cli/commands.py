@@ -79,6 +79,7 @@ def upload_github_issues(store, token):
             fail_condition=failure_check,
             timeout=500)
 
+
 ISSUE_GH = "https://api.github.com/repos/{gh_repo}/issues"
 ISSUE_BB = "https://bitbucket.org/{bb_repo}/issue/{number}"
 
