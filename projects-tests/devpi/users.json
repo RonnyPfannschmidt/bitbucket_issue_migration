@@ -150,7 +150,7 @@
   "ncoghlan": true,
   "nlevitt": true,
   "nolar": true,
-  "notsqrt": null,
+  "notsqrt": "NotSqrt",
   "onelson": true,
   "onlynone": true,
   "pasha_savchenko": "asfaltboy",
