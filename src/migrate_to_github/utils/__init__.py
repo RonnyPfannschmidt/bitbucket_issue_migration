@@ -54,20 +54,29 @@ def debug(data):
     click.echo(serializer.dumps(data, **PRETTY))
 
 
-def contributor(key, item):
-    if item.get(key):
-        return item[key]['username']
+def contributor(key, item, date_key=None):
+    if not item.get(key):
+        return
+    result = item[key]['username']
+    if date_key:
+        return (result, item[date_key])
+    return result
 
 
-def maybe_contributors(issue, comments):
-    yield contributor('reported_by', issue)
+def maybe_contributors(issue, comments, include_date=False):
+    yield contributor(
+        'reported_by', issue,
+        date_key='utc_last_updated' if include_date else None)
     yield from (
-        contributor('author_info', comment)
+        contributor(
+            'author_info', comment,
+            date_key='utc_updated_on' if include_date else None)
         for comment in comments)
 
 
-def contributors(issue, comments):
-    return filter(None, maybe_contributors(issue, comments))
+def contributors(issue, comments, include_date=False):
+    return filter(None, maybe_contributors(
+        issue, comments, include_date=include_date))
 
 
 @attr.s

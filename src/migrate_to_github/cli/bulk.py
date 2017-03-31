@@ -1,3 +1,4 @@
+from functools import partial
 from pathlib2 import Path
 import click
 
@@ -32,6 +33,14 @@ def fetch(stores):
 @command
 def extract_users(stores):
     map_stores(stores, commands.extract_users)
+
+
+@command
+@click.option('-u', '--only-unmapped', is_flag=True)
+def user_stats(stores, only_unmapped):
+    map_stores(stores, partial(
+        commands.user_stats,
+        only_unmapped=only_unmapped))
 
 
 @command
