@@ -17,7 +17,7 @@ SEP = '-' * 10
 @click.argument('repo')
 @click.argument('targetrepo')
 @click.argument('user')
-@click.argument('password')
+@click.password_option()
 @click.option('--dry-run', is_flag=True)
 def main(repo, targetrepo, user, password, dry_run):
     auth = user, password

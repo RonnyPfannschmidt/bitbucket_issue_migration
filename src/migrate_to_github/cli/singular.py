@@ -47,7 +47,7 @@ def convert(store, verbose):
 
 
 @command
-@click.option('--token', envvar='GITHUB_TOKEN')
+@click.option('--token', envvar='GITHUB_TOKEN', required=True)
 def upload(store, token):
     commands.upload_github_issues(store, token)
 
